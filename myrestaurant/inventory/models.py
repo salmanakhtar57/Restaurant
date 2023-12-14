@@ -3,33 +3,32 @@ from django.db import models
 # Create your models here.
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=50)
-    quantity_available = models.PositiveIntegerField()
-    price = models.IntegerField(max_length=5)
+    name = models.CharField(max_length=250)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    unit = models.CharField(max_length=20)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     
     def __str__(self):
         return self.name
 
 class MenuItem(models.Model):
-    name = models.CharField(max_length=50)
-    price = models.IntegerField(max_length=5)
-    ingredients = models.ManyToManyField(Ingredient, through='RecipeRequirement')
+    title = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return self.name
+        return self.title
 
 class RecipeRequirement(models.Model):
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    quantity_required = models.IntegerField()
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.menu_item.name} - {self.ingredient.name}"
+        return f"{self.menu_item.title} - {self.ingredient.name} ({self.quantity} {self.ingredient.unit})"
     
 class Purchase(models.Model):
+    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
-    item_purchased = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    quantity_purchased = models.IntegerField()
 
     def __str__(self):
-        return f"{self.timestamp} - {self.item_purchased.name} ({self.quantity_purchased})"
+        return f"{self.timestamp} - {self.menu_item.title}"
