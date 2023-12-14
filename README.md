@@ -1,0 +1,2 @@
+# Restaurant
+Django Restaurant
